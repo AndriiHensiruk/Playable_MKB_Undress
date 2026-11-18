@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Playable_MKB_Undress</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .frame {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: calc(100vh * 9 / 16);
+      max-height: calc(100vw * 16 / 9);
+      background: #000;
+     /* box-shadow: 0 0 50px rgba(0,0,0,0.8);*/
+      overflow: hidden;
+    }
+
+    .splash, .playable {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .splash-bg, .background {
+      position: absolute;
+      inset: 0;
+      background: url('assets/bg.webp') center/cover no-repeat;
+      z-index: 0;
+    }
+
+    .splash {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+
+    .splash-bg { filter: blur(8px); transform: scale(1.1); }
+
+    .girl-splash-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 1; 
+        pointer-events: none; 
+        filter: blur(2px); 
+        opacity: 0.8;
+    }
+    .girl-splash-layer img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    /* Контейнер UI */
+    .splash-ui {
+      top: -5%;
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 85%;
+      gap: 5px; 
+    }
+
+    .logo {
+      width: 120%;   
+      aspect-ratio: 20/7; 
+      background: url('assets/title.png') center/contain no-repeat;
+      position: relative;
+      top: 0;
+    }
+
+    .start-btn { 
+      position: relative;
+      width: 100%;     
+      max-width: 350px; 
+      aspect-ratio: 2/1; 
+      background: url('assets/start-btn.png') center/contain no-repeat; 
+      border: none; 
+      cursor: pointer;
+      animation: pulseBtn 2s ease-in-out infinite; 
+      outline: none;
+      transform-origin: center;
+      margin-top: -45px;    }
+
+   
+    .hand {
+      position: absolute;
+      top: 50%;    
+      right: 25%;    
+      width: 100px;
+      height: 100px;
+      background: url('assets/hand-cursor.png') center/contain no-repeat;
+      animation: tapHand 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pulseBtn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    @keyframes tapHand {
+      0%, 100% { transform: translate(100, 100) scale(1); }
+      40%, 60% { transform: translate(-5px, -10px) scale(0.85); }
+    }
+
+    /* --- Character & Gameplay --- */
+    .girl-container {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      animation: lively 4s ease-in-out infinite;
+    }
+    .girl-container img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain; 
+      opacity: 0;
+    }
+    .girl-container img.active { opacity: 1; }
+
+    @keyframes lively {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
+    }
+
+    .hitbox {
+      position: absolute;
+      z-index: 100 !important;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hitbox.shirt { 
+      top: 25%; 
+      height: 35%; 
+      width: 65%; 
+      left: 25%; 
+      /*background: rgba(255, 0, 0, 0.4) !important;*/ }
+    .hitbox.pants { 
+      top: 50%; 
+      height: 35%; 
+      width: 80%; 
+      left: 0%; 
+      /*background: rgba(37, 234, 102, 0.4) !important; */ }
+    
+    .contour { pointer-events: none; z-index: 40; }
+    .blink { animation: blink 1.2s ease-in-out infinite; }
+    @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    .music-btn {
+      position: absolute;
+      top: 15px; right: 15px;
+      width: 45px; height: 45px;
+      border: none;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 200;
+    }
+
+    .final-text {
+      position: absolute;
+      top: 5%; left: 35%;
+      transform: translateX(-50%);
+      width: 80%; height: 15%;
+      background: url('assets/final-text.png') center/contain no-repeat;
+      opacity: 0;
+      z-index: 5;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .final-text.active { opacity: 1; }
+
+    .cta {
+      position: absolute;
+      bottom: 40%; left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      width: 80%; height: 12%;
+      z-index: 50;
+    }
+    .cta button {
+      width: 120%; height: 120%;
+      background: url('assets/play-btn.png') center/contain no-repeat;
+      border: none; cursor: pointer;
+      animation: pulseBtn 1.5s infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="frame">
+    <div class="splash" id="splash">
+      <div class="splash-bg"></div>
+      
+      <div class="girl-splash-layer">
+          <img src="assets/girl_full.webp">
+      </div>
+      
+      <div class="splash-ui">
+        <div class="logo"></div>
+        <button class="start-btn">
+            <div class="hand"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="playable" id="playable" style="display: none; opacity: 0;">
+      <div class="background"></div>
+      <button id="musicToggle" class="music-btn">🔊</button>
+
+      <div class="girl-container">
+        <img src="assets/girl_full.webp" id="girlBase" class="active">
+        <img src="assets/girl_no_pants.webp" id="girlNoPants">
+        <img src="assets/girl_no_shirt.webp" id="girlNoShirt">
+        <img src="assets/girl_lingerie.webp" id="girlLingerie">
+
+        <img src="assets/contour_pants.webp" id="contourPants" class="contour blink"> 
+        <img src="assets/contour_shirt.webp" id="contourShirt" class="contour blink">
+        
+        <div id="shirtHitbox" class="hitbox shirt"></div> 
+        <div id="pantsHitbox" class="hitbox pants"></div>
+      </div>
+     
+      <div class="final-text" id="finalText"></div>
+      <div class="cta" id="cta">
+          <button onclick="goGame()"></button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgMusic" src="assets/bg-music.mp3" loop muted></audio>
+  <audio id="removeSound" src="assets/remove.mp3"></audio>
+  <audio id="winSound" src="assets/win.mp3"></audio>
+
+  <script>
+    const state = { pantsRemoved: false, shirtRemoved: false, gameStarted: false };
+    const elements = {
+      splash: document.getElementById('splash'),
+      playable: document.getElementById('playable'),
+      girlBase: document.getElementById('girlBase'),
+      girlNoPants: document.getElementById('girlNoPants'),
+      girlNoShirt: document.getElementById('girlNoShirt'),
+      girlLingerie: document.getElementById('girlLingerie'),
+      contourPants: document.getElementById('contourPants'),
+      contourShirt: document.getElementById('contourShirt'),
+      cta: document.getElementById('cta'),
+      finalText: document.getElementById('finalText'),
+      bgMusic: document.getElementById('bgMusic'),
+      removeSound: document.getElementById('removeSound'),
+      winSound: document.getElementById('winSound'),
+      musicToggle: document.getElementById('musicToggle')
+    };
+
+    elements.musicToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      elements.bgMusic.muted = !elements.bgMusic.muted;
+      elements.musicToggle.textContent = elements.bgMusic.muted ? '🔇' : '🔊';
+    });
+
+    const startAction = () => {
+      if (state.gameStarted) return;
+      state.gameStarted = true;
+      elements.splash.style.opacity = '0';
+      setTimeout(() => {
+        elements.splash.style.display = 'none';
+        elements.playable.style.display = 'block';
+        setTimeout(() => elements.playable.style.opacity = '1', 50);
+      }, 500);
+      elements.bgMusic.muted = false;
+      elements.bgMusic.play();
+      elements.bgMusic.volume = 0.02;
+    };
+
+    elements.splash.addEventListener('click', startAction);
+
+    function updateVisuals() {
+      [elements.girlBase, elements.girlNoPants, elements.girlNoShirt, elements.girlLingerie]
+        .forEach(el => el.classList.remove('active'));
+
+      if (state.pantsRemoved && state.shirtRemoved) {
+        elements.girlLingerie.classList.add('active');
+        showFinal();
+      } else if (state.pantsRemoved) {
+        elements.girlNoPants.classList.add('active');
+      } else if (state.shirtRemoved) {
+        elements.girlNoShirt.classList.add('active');
+      } else {
+        elements.girlBase.classList.add('active');
+      }
+    }
+
+    document.getElementById('shirtHitbox').addEventListener('click', () => {
+      if (state.shirtRemoved) return;
+      state.shirtRemoved = true;
+      elements.contourShirt.style.display = 'none';
+      elements.removeSound.currentTime = 0;
+      elements.removeSound.play();
+      updateVisuals();
+    });
+
+    document.getElementById('pantsHitbox').addEventListener('click', () => {
+      if (state.pantsRemoved) return;
+      state.pantsRemoved = true;
+      elements.contourPants.style.display = 'none';
+      elements.removeSound.currentTime = 0;
+      elements.removeSound.play();
+      updateVisuals();
+    });
+
+    function showFinal() {
+      elements.finalText.classList.add('active');
+      elements.cta.style.display = 'flex';
+      elements.winSound.play();
+      document.querySelectorAll('.hitbox').forEach(h => h.style.display = 'none');
+    }
+
+    function goGame() { window.location.href = 'https://hanimax.com/serials/mom-knows-best/1'; }
+  </script>
+</body>
+</html>
